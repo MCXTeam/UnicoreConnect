@@ -4,7 +4,7 @@ defaultTasks 'build'
 
 allprojects {
     group 'uno.unicore'
-    version '1.0.5-STABLE'
+    version '1.0.5'
 }
 
 subprojects {
@@ -25,9 +25,6 @@ subprojects {
             url "https://repo.codemc.io/repository/maven-public/"
         }
         maven {
-            url 'https://repo.panda-lang.org/releases'
-        }
-        maven {
             url "https://ci.frostcast.net/plugin/repository/everything"
         }
         maven {
@@ -37,7 +34,7 @@ subprojects {
             url "https://repo.essentialsx.net/releases/"
         }
         maven {
-            url "https://papermc.io/repo/repository/maven-public/"
+            url "https://repo.papermc.io/repository/maven-public/"
         }
         maven {
             url = "https://repo.aikar.co/content/groups/aikar/"

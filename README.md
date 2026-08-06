@@ -1,7 +1,7 @@
-<img src="https://github.com/UnicoreProject/UnicoreConnect/blob/main/unicoreconnect.png?raw=true?v=2" />
+<img src="https://github.com/MCXTeam/UnicoreConnect/blob/main/unicoreconnect.png?raw=true?v=2" />
 
 # UnicoreConnect ![Kotlin](https://img.shields.io/badge/-Kotlin-05122A?style=flat&logo=Kotlin&logoColor=FFA518)&nbsp;
-[![Build Status](https://github.com/UnicoreProject/UnicoreConnect/actions/workflows/gradle.yml/badge.svg)](https://github.com/UnicoreProject/UnicoreConnect/actions)
+[![Build Status](https://github.com/MCXTeam/UnicoreConnect/actions/workflows/gradle.yml/badge.svg)](https://github.com/MCXTeam/UnicoreConnect/actions)
 
 > Плагин **Spigot/Sponge** для интеграции экономики, прав, групп, склада-покупок, банов и сбора статистики между сайтом и серверами.
 
@@ -17,7 +17,7 @@
 * **Vault** - включит модуль внутриигровой экономики (Spigot)
 
 ## Установка и настройка
-1. [Создайте API-ключ](https://unicorecms.ru/docs/admin/api-keys#создание-api-ключа) с правом `unicore.kernel.connect`.
+1. [Создайте API-ключ](https://unicorecms.ru/docs/admin/api-keys#создание-api-ключа) с правом `kernel.unicore.connect`.
 2. Поместите Jar-файл в папку плагинов.
 3. Произведите настройку файла конфигурации UnicoreConnect.
 
@@ -37,7 +37,7 @@ UnicoreConnect использует Gradle для обработки завис�
 
 #### Компиляция
 ```sh
-git clone https://github.com/UnicoreProject/UnicoreConnect.git
+git clone https://github.com/MCXTeam/UnicoreConnect.git
 cd UnicoreConnect/
 ./gradlew build
 ```

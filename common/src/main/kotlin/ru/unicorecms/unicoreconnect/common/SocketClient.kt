@@ -40,7 +40,8 @@ class SocketClient(private  val logger: Logger) {
                 if (!data.perms.contains("kernel.unicore.connect")) {
                     logger.warning("'apiKey' not have permission 'kernel.unicore.connect'")
                 } else {
-                    logger.info("Successfully connected to UnicoreCMS socket")
+                    //TODO сделать только 1 коннект лог ибо это шняга спамит не по детски =)
+                    //logger.info("Successfully connected to UnicoreCMS socket")
                 }
             }
         }
