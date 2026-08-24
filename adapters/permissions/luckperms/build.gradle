@@ -1,0 +1,9 @@
+plugins {
+    id 'org.jetbrains.kotlin.jvm' version '1.9.25'
+}
+
+dependencies {
+    api project(':UnicoreConnect-common')
+
+    compileOnly 'net.luckperms:api:5.4'
+}

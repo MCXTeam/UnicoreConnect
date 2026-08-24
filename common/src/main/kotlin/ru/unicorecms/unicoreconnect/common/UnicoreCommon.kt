@@ -2,6 +2,7 @@ package ru.unicorecms.unicoreconnect.common
 
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
+import ru.unicorecms.unicoreconnect.common.config.MessagesConfig
 import ru.unicorecms.unicoreconnect.common.config.UnicoreConfig
 import ru.unicorecms.unicoreconnect.common.http.UnicoreRequester
 import ru.unicorecms.unicoreconnect.common.services.*
@@ -13,8 +14,9 @@ class UnicoreCommon(pluginConfig: UnicoreConfig) {
     companion object {
         val gson: Gson = GsonBuilder().create()
         var server: Server? = null
+        var messages: ((String, String) -> String?)? = null
         var itemsMap = mutableMapOf<String, String>()
-        var itemsMapDefault =  mapOf(
+        var itemsMapDefault = mapOf(
             "minecraft_spawn_egg" to "MONSTER_EGG",
             "minecraft_dye" to "INK_SACK",
             "minecraft_mycelium" to "MYCEL"
@@ -23,7 +25,6 @@ class UnicoreCommon(pluginConfig: UnicoreConfig) {
         lateinit var config: UnicoreConfig
         lateinit var requester: UnicoreRequester
 
-        // Services
         lateinit var serversService: ServerService
         lateinit var banService: BanService
         lateinit var moneyService: MoneyService
@@ -36,6 +37,7 @@ class UnicoreCommon(pluginConfig: UnicoreConfig) {
     init {
         config = pluginConfig
         requester = UnicoreRequester()
+        messages = { key, name -> config.messages.of(key)?.replace(MessagesConfig.PLACEHOLDER_NAME, name) }
 
         serversService = ServerService()
         banService = BanService()

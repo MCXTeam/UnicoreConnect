@@ -1,0 +1,104 @@
+plugins {
+    id 'com.gtnewhorizons.retrofuturagradle' version '2.0.3'
+    id 'org.jetbrains.kotlin.jvm' version '2.2.20'
+    id 'com.gradleup.shadow' version '9.6.1'
+}
+
+group = 'uno.unicore'
+version = modVersion
+
+base {
+    archivesName = "UnicoreConnect-forge-${minecraftVersion}"
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(8)
+    }
+}
+
+minecraft {
+    mcVersion = minecraftVersion
+}
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+    maven { url = 'https://nexus.gtnewhorizons.com/repository/public/' }
+}
+
+configurations {
+    shade
+    implementation.extendsFrom shade
+}
+
+dependencies {
+    shade("uno.unicore:UnicoreConnect-common:${modVersion}") { transitive = false }
+    shade("uno.unicore:UnicoreConnect-permissions-forgeessentials:${modVersion}") { transitive = false }
+
+    shade 'org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.2.20'
+    shade 'io.socket:socket.io-client:2.1.1'
+    shade 'com.squareup.okhttp3:okhttp:4.12.0'
+    shade 'com.google.code.gson:gson:2.8.9'
+}
+
+[
+    compilePatchedMcKotlin: 'decompressDecompiledSources',
+    compileInjectedTagsKotlin: 'injectTags',
+    compileMcLauncherKotlin: 'createMcLauncherFiles',
+].each { kotlinTask, producer ->
+    tasks.named(kotlinTask).configure {
+        dependsOn producer
+    }
+}
+
+tasks.named('processResources', ProcessResources).configure {
+    inputs.property 'modVersion', project.version
+
+    filesMatching('mcmod.info') {
+        expand 'modVersion': project.version, 'minecraftVersion': minecraftVersion
+    }
+}
+
+tasks.named('jar', Jar).configure {
+    archiveClassifier.set('slim')
+}
+
+tasks.named('reobfJar').configure {
+    enabled = false
+}
+
+tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar).configure {
+    configurations = [project.configurations.shade]
+    archiveClassifier.set('dev')
+
+    relocate 'kotlin', 'ru.unicorecms.unicoreconnect.libs.kotlin'
+    relocate 'org.intellij', 'ru.unicorecms.unicoreconnect.libs.intellij'
+    relocate 'org.jetbrains.annotations', 'ru.unicorecms.unicoreconnect.libs.annotations'
+    relocate 'io.socket', 'ru.unicorecms.unicoreconnect.libs.socket'
+    relocate 'com.google.gson', 'ru.unicorecms.unicoreconnect.libs.gson'
+    relocate 'okhttp3', 'ru.unicorecms.unicoreconnect.libs.okhttp3'
+    relocate 'okio', 'ru.unicorecms.unicoreconnect.libs.okio'
+    relocate 'org.json', 'ru.unicorecms.unicoreconnect.libs.json'
+
+    exclude 'META-INF/maven/**'
+    exclude 'META-INF/*.SF'
+    exclude 'META-INF/*.DSA'
+    exclude 'META-INF/*.RSA'
+}
+
+def reobfShadowJar = tasks.named('reobfShadowJar')
+
+tasks.named('assemble').configure {
+    dependsOn reobfShadowJar
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+}
+
+kotlin {
+    compilerOptions {
+        jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_1_8
+    }
+}

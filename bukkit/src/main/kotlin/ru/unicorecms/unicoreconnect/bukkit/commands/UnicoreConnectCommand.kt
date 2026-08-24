@@ -7,6 +7,7 @@ import co.aikar.commands.annotation.Subcommand
 import org.bukkit.Bukkit
 import org.bukkit.command.CommandSender
 import ru.unicorecms.unicoreconnect.bukkit.PluginInstance
+import ru.unicorecms.unicoreconnect.common.Permissions
 import ru.unicorecms.unicoreconnect.common.UnicoreCommon
 import ru.unicorecms.unicoreconnect.common.services.donate.DonateGroupService
 import ru.unicorecms.unicoreconnect.common.services.donate.DonatePermissionService
@@ -15,7 +16,7 @@ import ru.unicorecms.unicoreconnect.common.services.donate.DonatePermissionServi
 class UnicoreConnectCommand : BaseCommand() {
     private val plugin = PluginInstance.plugin
 
-    @CommandPermission("unicoreconnect.admin.sync")
+    @CommandPermission(Permissions.SYNC)
     @Subcommand("sync")
     fun sync (sender: CommandSender) = Bukkit.getScheduler().runTaskAsynchronously(plugin, Runnable {
         try {

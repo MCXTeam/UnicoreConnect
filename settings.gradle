@@ -1,7 +1,30 @@
+pluginManagement {
+    repositories {
+        gradlePluginPortal()
+        mavenCentral()
+    }
+}
+
+plugins {
+    id 'org.gradle.toolchains.foojay-resolver-convention' version '0.8.0'
+}
+
 rootProject.name = 'UnicoreConnect'
 
 include 'common'
 findProject(':common')?.name = 'UnicoreConnect-common'
+
+include 'adapters:permissions:luckperms'
+project(':adapters:permissions:luckperms').name = 'UnicoreConnect-permissions-luckperms'
+
+include 'adapters:permissions:forgeessentials'
+project(':adapters:permissions:forgeessentials').name = 'UnicoreConnect-permissions-forgeessentials'
+
+include 'adapters:economy:vault'
+project(':adapters:economy:vault').name = 'UnicoreConnect-economy-vault'
+
+include 'adapters:bans:banmanager'
+project(':adapters:bans:banmanager').name = 'UnicoreConnect-bans-banmanager'
 
 include 'bukkit'
 findProject(':bukkit')?.name = 'UnicoreConnect-bukkit'

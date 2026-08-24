@@ -1,25 +1,63 @@
 <img src="https://github.com/MCXTeam/UnicoreConnect/blob/main/unicoreconnect.png?raw=true?v=2" />
 
 # UnicoreConnect ![Kotlin](https://img.shields.io/badge/-Kotlin-05122A?style=flat&logo=Kotlin&logoColor=FFA518)&nbsp;
-[![Build Status](https://github.com/MCXTeam/UnicoreConnect/actions/workflows/gradle.yml/badge.svg)](https://github.com/MCXTeam/UnicoreConnect/actions)
+[![Build Status](https://github.com/MCXTeam/UnicoreConnect/actions/workflows/build.yml/badge.svg)](https://github.com/MCXTeam/UnicoreConnect/actions)
 
-> Плагин **Spigot/Sponge** для интеграции экономики, прав, групп, склада-покупок, банов и сбора статистики между сайтом и серверами.
+> Связывает игровой сервер с UnicoreCMS: экономика, донат-группы и права, склад покупок, баны и статистика онлайна.
 
-#### Поддерживаемые ядра
-- Spigot/Bukkit 1.7.10 - 1.18.1, также их форки по типу PaperSpigot.
-- Гибритные ядра: Thermos, Mohist, Magma и т. д.
-- Sponge Vanilla и Sponge Forge.
+## Поддерживаемые платформы
 
-#### Опциональные зависимости
-* **LuckPerms** - включит модуль выдачи донат-прав/групп (Spigot/Sponge)
-* **BanManager** - включит модуль двухнаправленной интеграции банов с сайтом (Spigot/Sponge)
-* **Essentials/EssentialsX/CMI/Nucleus** - проверка на AFK модулем PlayTime (Spigot/Sponge)
-* **Vault** - включит модуль внутриигровой экономики (Spigot)
+| Файл | Платформа | Версии игры | Java |
+| --- | --- | --- | --- |
+| `UnicoreConnect-universal` | Spigot, Paper и их форки, гибриды (Thermos, Mohist, Magma) | 1.7.10 — 1.18.1 | 8+ |
+| `UnicoreConnect-forge-1.7.10` | Forge | 1.7.10 | 8 |
+| `UnicoreConnect-forge-1.12.2` | Forge | 1.12.2 | 8 |
+| `UnicoreConnect-forge-1.19.2` | Forge | 1.19.2 | 17 |
+| `UnicoreConnect-forge-1.20.1` | Forge | 1.20.1 | 17 |
+| `UnicoreConnect-neoforge-1.21.1` | NeoForge | 1.21.1 | 21 |
+
+Файлы с суффиксами `-slim` и `-dev` — промежуточные сборки, на сервер ставится файл без суффикса.
+
+## Адаптеры
+
+Ядро не знает ни об одном стороннем плагине: оно обращается к адаптерам, которые лежат в `adapters/`.
+Адаптер включается сам, если нужный плагин найден на сервере.
+
+### Права и группы
+
+| Адаптер | Где работает | Что делает |
+| --- | --- | --- |
+| `luckperms` | Bukkit, Forge с портом LuckPerms | Выдаёт группы и права через API, понимает срок действия |
+| `forgeessentials` | Forge 1.7.10 и 1.12.2 | Выдаёт группы и права через API ForgeEssentials |
+| `commands` | везде | Выполняет консольные команды из конфигурации |
+
+Адаптер выбирается настройкой `permissions.adapter`: `auto` — взять первый доступный,
+либо имя адаптера из таблицы.
+
+Адаптер `commands` рассчитан на плагины без публичного API: в шаблонах команд доступны
+`{user.uuid}`, `{user.username}`, `{group.ingame_id}`, `{permission.node}` и `{period.duration}`.
+По умолчанию шаблоны написаны под LuckPerms.
+
+ForgeEssentials не хранит срок действия прав: временные группы снимаются сайтом — при следующем
+входе игрока набор групп и прав приводится к тому, что записано в UnicoreCMS.
+
+### Экономика и баны
+
+| Адаптер | Где работает | Что делает |
+| --- | --- | --- |
+| `vault` | Bukkit | Отдаёт баланс сайта другим плагинам через Vault |
+| `banmanager` | Bukkit | Двусторонняя синхронизация банов с сайтом |
+
+На Forge баны идут через ванильный банлист сервера, а экономика работает сама по себе —
+баланс хранится на сайте.
 
 ## Установка и настройка
+
 1. [Создайте API-ключ](https://unicorecms.ru/docs/admin/api-keys#создание-api-ключа) с правом `kernel.unicore.connect`.
-2. Поместите Jar-файл в папку плагинов.
-3. Произведите настройку файла конфигурации UnicoreConnect.
+2. Положите файл в папку `plugins` (Bukkit) или `mods` (Forge, NeoForge).
+3. Запустите сервер — конфигурация создастся сама, впишите в неё адрес сайта и ключ.
+
+Bukkit читает `plugins/UnicoreConnect/config.yml`:
 
 ```yaml
 server: id сервера
@@ -28,21 +66,55 @@ api:
   key: API-ключ
 ```
 
+Forge и NeoForge читают `config/unicoreconnect.json`:
+
+```json
+{
+  "server": "id сервера",
+  "apiUrl": "Адрес UnicoreCMS-сервера",
+  "apiKey": "API-ключ",
+  "modules": {
+    "money": true,
+    "playtime": true,
+    "showcase": true,
+    "donate": true,
+    "bans": true
+  },
+  "permissions": {
+    "adapter": "auto"
+  }
+}
+```
+
+Любой модуль можно выключить в разделе `modules` — команды и обработчики выключенного модуля
+не регистрируются.
+
 ## Сборка
-UnicoreConnect использует Gradle для обработки зависимостей и сборки.
 
-#### Зависимости
-* Java 8 JDK или более поздней версии
+#### Что нужно
 * Git
+* JDK 21 — для Bukkit и Forge 1.19.2 и новее
+* JDK 25 и JDK 8 — для Forge 1.7.10 и 1.12.2: Gradle 9 запускается на 25, мод компилируется под 8
 
-#### Компиляция
+#### Bukkit и Forge 1.19.2 и новее
+
 ```sh
 git clone https://github.com/MCXTeam/UnicoreConnect.git
 cd UnicoreConnect/
 ./gradlew build
+cd platforms/forge-1.20.1 && ../../gradlew build
 ```
 
-Собранный Jar-файл будет лежать в папке build/libs
+#### Forge 1.7.10 и 1.12.2
+
+Старые версии собираются отдельным Gradle, поэтому ядро сначала кладётся в mavenLocal:
+
+```sh
+./gradlew publishToMavenLocal
+cd platforms/forge-1.12.2 && ./gradlew build
+```
+
+Собранные файлы лежат в `build/libs`.
 
 ## Команды и права
 
@@ -75,9 +147,26 @@ cd UnicoreConnect/
 | /cart create \[price\] \[name\] | unicoreconnect.admin.showcase.create | Добавить предмет, находящийся в руке в магазин |
 | /uc sync или /unicoreconnect sync | unicoreconnect.admin.sync | Переподключится к UnicoreServer и заного синхронизировать донат-группы и донат-права |
 
-## Локализация
+На Forge 1.12.2 права команд регистрируются в `PermissionAPI`, поэтому их видит ForgeEssentials
+и любой другой обработчик прав. Если обработчика нет, команды доступны игрокам с уровнем оператора.
 
-Для редактирования исходных сообщений, откройте файл плагина, как архив. Сообщения хранятся в файле **acf-unicoreconnect_ru.properties**
+## Тексты сообщений
+
+Forge и NeoForge берут сообщения о выдаче донат-групп и прав из раздела `messages` файла
+`config/unicoreconnect.json`:
+
+```json
+{
+  "messages": {
+    "giveGroup": "Донат-группа «{name}» выдана",
+    "takeGroup": "Донат-группа «{name}» снята",
+    "givePermission": "Донат-право «{name}» выдано",
+    "takePermission": "Донат-право «{name}» снято"
+  }
+}
+```
+
+Bukkit хранит тексты в файле **acf-unicoreconnect_ru.properties** внутри архива плагина:
 
 ```properties
 unicoreconnect.command_money=Ваш баланс на сервере {server}: <c2>{money}</c2>

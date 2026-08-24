@@ -4,14 +4,17 @@ defaultTasks 'build'
 
 allprojects {
     group 'uno.unicore'
-    version '1.0.5'
+    version '1.1.0'
 }
 
 subprojects {
     apply plugin: 'java'
 
-    sourceCompatibility = 1.8
-    targetCompatibility = 1.8
+    java {
+        toolchain {
+            languageVersion = JavaLanguageVersion.of(8)
+        }
+    }
 
     repositories {
         mavenCentral()
@@ -50,5 +53,21 @@ subprojects {
 
     tasks.withType(JavaCompile) {
         options.encoding = 'UTF-8'
+    }
+}
+
+configure([
+    project(':UnicoreConnect-common'),
+    project(':adapters:permissions:UnicoreConnect-permissions-luckperms'),
+    project(':adapters:permissions:UnicoreConnect-permissions-forgeessentials'),
+]) {
+    apply plugin: 'maven-publish'
+
+    publishing {
+        publications {
+            core(MavenPublication) {
+                from components.java
+            }
+        }
     }
 }

@@ -9,16 +9,19 @@ import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 import ru.unicorecms.unicoreconnect.bukkit.CommandManager
 import ru.unicorecms.unicoreconnect.bukkit.PluginInstance
-import ru.unicorecms.unicoreconnect.bukkit.hooks.vault.Vault
+import ru.unicorecms.unicoreconnect.common.Permissions
 import ru.unicorecms.unicoreconnect.common.UnicoreCommon
+import ru.unicorecms.unicoreconnect.common.format.Formats
 
 
 @CommandAlias("money|bal|balance")
 class MoneyCommand : BaseCommand() {
     private val plugin = PluginInstance.plugin
 
+    private fun format(amount: Double): String = Formats.money(amount)
+
     @Default
-    @CommandPermission("unicoreconnect.command.money")
+    @CommandPermission(Permissions.MONEY)
     fun main(player: Player) = Bukkit.getScheduler().runTaskAsynchronously(plugin, Runnable {
         val resp = UnicoreCommon.moneyService.findOne(player.uniqueId)
 
@@ -29,7 +32,7 @@ class MoneyCommand : BaseCommand() {
                     "{server}",
                     UnicoreCommon.server!!.name,
                     "{money}",
-                    Vault.provider!!.format(resp.money)
+                    format(resp.money)
                 )
             )
         )
@@ -37,12 +40,12 @@ class MoneyCommand : BaseCommand() {
 
     @Subcommand("pay")
     @Syntax("[player] [amount]")
-    @CommandPermission("unicoreconnect.command.money.pay")
+    @CommandPermission(Permissions.MONEY_PAY)
     fun pay(player: Player, target: OnlinePlayer, amount: Double) = Bukkit.getScheduler().runTaskAsynchronously(plugin, Runnable {
         try {
             val resp = UnicoreCommon.moneyService.transfer(
                 player.uniqueId,
-                player.address.toString(),
+                player.address?.address?.hostAddress ?: "127.0.0.1",
                 target.player.uniqueId,
                 amount
             )
@@ -51,9 +54,9 @@ class MoneyCommand : BaseCommand() {
                     "unicoreconnect.command_money_pay",
                     replacements = arrayOf(
                         "{amount}",
-                        Vault.provider!!.format(amount),
+                        format(amount),
                         "{money}",
-                        Vault.provider!!.format(resp.money),
+                        format(resp.money),
                         "{target}",
                         target.player.name
                     )
@@ -62,7 +65,7 @@ class MoneyCommand : BaseCommand() {
             target.player.sendMessage(
                 CommandManager.msg(
                     "unicoreconnect.command_money_pay_target",
-                    replacements = arrayOf("{amount}", Vault.provider!!.format(amount), "{player}", player.name)
+                    replacements = arrayOf("{amount}", format(amount), "{player}", player.name)
                 )
             )
         } catch (_: Exception) {
@@ -71,7 +74,7 @@ class MoneyCommand : BaseCommand() {
     })
 
     @Subcommand("top")
-    @CommandPermission("unicoreconnect.command.money.top")
+    @CommandPermission(Permissions.MONEY_TOP)
     fun top(sender: CommandSender) = Bukkit.getScheduler().runTaskAsynchronously(plugin, Runnable {
         val resp = UnicoreCommon.moneyService.top()
         sender.sendMessage(
@@ -82,9 +85,7 @@ class MoneyCommand : BaseCommand() {
                     UnicoreCommon.server!!.name,
                     "{rows}",
                     resp.mapIndexed { index, money ->
-                        "${index + 1}.${money.user.username} - ${
-                            Vault.provider!!.format(money.money)
-                        }"
+                        "${index + 1}.${money.user.username} - ${format(money.money)}"
                     }.joinToString("\n")
                 )
             )

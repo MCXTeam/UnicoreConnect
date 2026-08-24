@@ -10,6 +10,7 @@ import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.InventoryType
 import ru.unicorecms.unicoreconnect.bukkit.utils.ItemMagic
+import ru.unicorecms.unicoreconnect.common.Permissions
 import ru.unicorecms.unicoreconnect.common.UnicoreCommon
 import ru.unicorecms.unicoreconnect.common.types.WarehouseItem
 import ru.unicorecms.unicoreconnect.bukkit.CommandManager
@@ -23,7 +24,7 @@ class ShowcaseCommand : BaseCommand() {
 
     @Subcommand("create")
     @Syntax("[price] [name]")
-    @CommandPermission("unicoreconnect.admin.showcase.create")
+    @CommandPermission(Permissions.SHOWCASE_CREATE)
     fun create(player: Player, price: Double, name: String) = Bukkit.getScheduler().runTaskAsynchronously(plugin, Runnable {
         val data = itemMagic.serialize(player.inventory.itemInHand, name, price)
         val req = UnicoreCommon.showcaseService.create(data)
@@ -35,7 +36,7 @@ class ShowcaseCommand : BaseCommand() {
     })
 
     @Subcommand("all")
-    @CommandPermission("unicoreconnect.command.showcase.all")
+    @CommandPermission(Permissions.SHOWCASE_ALL)
     fun all(player: Player) = Bukkit.getScheduler().runTaskAsynchronously(plugin, Runnable {
         val gived = arrayListOf<WarehouseItem>()
         val req = UnicoreCommon.showcaseService.find(player.uniqueId)
@@ -81,7 +82,7 @@ class ShowcaseCommand : BaseCommand() {
     })
 
     @Subcommand("list")
-    @CommandPermission("unicoreconnect.command.showcase.list")
+    @CommandPermission(Permissions.SHOWCASE_LIST)
     fun list(player: Player) = Bukkit.getScheduler().runTaskAsynchronously(plugin, Runnable {
         val req = UnicoreCommon.showcaseService.find(player.uniqueId)
 
@@ -95,7 +96,7 @@ class ShowcaseCommand : BaseCommand() {
 
     @Syntax("[id]")
     @Subcommand("give")
-    @CommandPermission("unicoreconnect.command.showcase.give")
+    @CommandPermission(Permissions.SHOWCASE_GIVE)
     fun give(player: Player, id: Int) = Bukkit.getScheduler().runTaskAsynchronously(plugin, Runnable {
         val gived = arrayListOf<WarehouseItem>()
         val req = UnicoreCommon.showcaseService.find(player.uniqueId).filter { it.id == id }

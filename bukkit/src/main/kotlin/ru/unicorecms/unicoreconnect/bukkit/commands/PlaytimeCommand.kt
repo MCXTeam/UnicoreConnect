@@ -8,26 +8,18 @@ import co.aikar.commands.annotation.Subcommand
 import org.bukkit.Bukkit
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
-import org.joda.time.Duration
-import org.joda.time.format.PeriodFormatterBuilder
+import ru.unicorecms.unicoreconnect.common.Permissions
 import ru.unicorecms.unicoreconnect.common.UnicoreCommon
+import ru.unicorecms.unicoreconnect.common.format.Formats
 import ru.unicorecms.unicoreconnect.bukkit.CommandManager
 import ru.unicorecms.unicoreconnect.bukkit.PluginInstance
 
 @CommandAlias("playtime|pt")
 class PlaytimeCommand : BaseCommand() {
     private val plugin = PluginInstance.plugin
-    private val formatter = PeriodFormatterBuilder()
-        .appendDays()
-        .appendSuffix("d ")
-        .appendHours()
-        .appendSuffix("h ")
-        .appendMinutes()
-        .appendSuffix("m ")
-        .toFormatter()
 
     @Default
-    @CommandPermission("unicoreconnect.command.playtime")
+    @CommandPermission(Permissions.PLAYTIME)
     fun main(player: Player) = Bukkit.getScheduler().runTaskAsynchronously(plugin, Runnable {
         val resp = UnicoreCommon.playtimeService.findOne(player.uniqueId)
 
@@ -38,20 +30,20 @@ class PlaytimeCommand : BaseCommand() {
                     "{server}",
                     UnicoreCommon.server!!.name,
                     "{time}",
-                    formatter.print(Duration(resp.time * 60 * 1000).toPeriod())
+                    Formats.duration(resp.time)
                 )
             )
         )
     })
 
     @Subcommand("top")
-    @CommandPermission("unicoreconnect.command.playtime.top")
+    @CommandPermission(Permissions.PLAYTIME_TOP)
     fun top(sender: CommandSender) = Bukkit.getScheduler().runTaskAsynchronously(plugin, Runnable {
         val resp = UnicoreCommon.playtimeService.findTop()
         sender.sendMessage(
             CommandManager.msg(
                 "unicoreconnect.command_playtime_top",
-                replacements = arrayOf( "{server}", UnicoreCommon.server!!.name, "{rows}", resp.mapIndexed { index, playtime -> "${index + 1}.${playtime.user.username} - ${formatter.print(Duration(playtime.time * 60 * 1000).toPeriod())}" }.joinToString("\n"))
+                replacements = arrayOf( "{server}", UnicoreCommon.server!!.name, "{rows}", resp.mapIndexed { index, playtime -> "${index + 1}.${playtime.user.username} - ${Formats.duration(playtime.time)}" }.joinToString("\n"))
             )
         )
     })

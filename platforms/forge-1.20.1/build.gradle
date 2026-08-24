@@ -1,0 +1,124 @@
+plugins {
+    id 'net.minecraftforge.gradle' version '[6.0.24,6.2)'
+    id 'org.jetbrains.kotlin.jvm' version '1.9.25'
+    id 'com.gradleup.shadow' version '8.3.5'
+}
+
+group = 'uno.unicore'
+version = modVersion
+
+base {
+    archivesName = "UnicoreConnect-forge-${minecraftVersion}"
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+}
+
+sourceSets {
+    main {
+        kotlin { srcDir '../forge-shared/src/main/kotlin' }
+        resources { srcDir '../forge-shared/src/main/resources' }
+    }
+}
+
+minecraft {
+    mappings channel: 'official', version: minecraftVersion
+
+    runs {
+        server {
+            workingDirectory project.file('run')
+            property 'forge.logging.markers', 'REGISTRIES'
+            property 'forge.logging.console.level', 'debug'
+            mods {
+                unicoreconnect {
+                    source sourceSets.main
+                }
+            }
+        }
+    }
+}
+
+repositories {
+    mavenCentral()
+    maven { url = 'https://maven.minecraftforge.net' }
+    maven { url = 'https://repo.luckperms.net' }
+}
+
+configurations {
+    shade
+    implementation.extendsFrom shade
+}
+
+dependencies {
+    minecraft "net.minecraftforge:forge:${minecraftVersion}-${forgeVersion}"
+
+    shade('uno.unicore:UnicoreConnect-common') {
+        exclude group: 'org.jetbrains', module: 'annotations'
+    }
+    shade('uno.unicore:UnicoreConnect-permissions-luckperms') {
+        exclude group: 'org.jetbrains', module: 'annotations'
+    }
+
+    compileOnly 'net.luckperms:api:5.4'
+}
+
+tasks.named('processResources', ProcessResources).configure {
+    def replacements = [
+        modVersion       : project.version,
+        minecraftVersion : minecraftVersion,
+        forgeVersionRange: forgeVersionRange,
+    ]
+
+    inputs.properties replacements
+
+    filesMatching('META-INF/mods.toml') {
+        expand replacements
+    }
+}
+
+tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar).configure {
+    configurations = [project.configurations.shade]
+    archiveClassifier.set('')
+
+    relocate 'kotlin', 'ru.unicorecms.unicoreconnect.libs.kotlin'
+    relocate 'org.intellij', 'ru.unicorecms.unicoreconnect.libs.intellij'
+    relocate 'io.socket', 'ru.unicorecms.unicoreconnect.libs.socket'
+    relocate 'com.google.gson', 'ru.unicorecms.unicoreconnect.libs.gson'
+    relocate 'okhttp3', 'ru.unicorecms.unicoreconnect.libs.okhttp3'
+    relocate 'okio', 'ru.unicorecms.unicoreconnect.libs.okio'
+    relocate 'org.json', 'ru.unicorecms.unicoreconnect.libs.json'
+
+    exclude 'META-INF/maven/**'
+    exclude 'META-INF/*.SF'
+    exclude 'META-INF/*.DSA'
+    exclude 'META-INF/*.RSA'
+
+    manifest {
+        attributes 'FMLModType': 'MOD'
+    }
+}
+
+tasks.named('jar').configure {
+    archiveClassifier.set('slim')
+}
+
+reobf {
+    shadowJar {}
+}
+
+tasks.named('assemble').configure {
+    dependsOn tasks.named('reobfShadowJar')
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+}
+
+kotlin {
+    compilerOptions {
+        jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17
+    }
+}

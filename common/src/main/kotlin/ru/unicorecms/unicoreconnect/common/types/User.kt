@@ -1,8 +1,8 @@
 package ru.unicorecms.unicoreconnect.common.types
 
 class User {
-    lateinit var uuid: String
-    lateinit var username: String
-    lateinit var perms: List<String>
+    var uuid: String = ""
+    var username: String = ""
+    var perms: List<String> = emptyList()
     var ban: Ban? = null
 }

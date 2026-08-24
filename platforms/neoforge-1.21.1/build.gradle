@@ -1,0 +1,107 @@
+plugins {
+    id 'net.neoforged.moddev' version '2.0.78'
+    id 'org.jetbrains.kotlin.jvm' version '1.9.25'
+    id 'com.gradleup.shadow' version '8.3.5'
+}
+
+group = 'uno.unicore'
+version = modVersion
+
+base {
+    archivesName = "UnicoreConnect-neoforge-${minecraftVersion}"
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
+neoForge {
+    version = neoforgeVersion
+
+    runs {
+        server {
+            server()
+        }
+    }
+
+    mods {
+        unicoreconnect {
+            sourceSet sourceSets.main
+        }
+    }
+}
+
+repositories {
+    mavenCentral()
+    maven { url = 'https://maven.neoforged.net/releases' }
+    maven { url = 'https://repo.luckperms.net' }
+}
+
+configurations {
+    shade
+    implementation.extendsFrom shade
+}
+
+dependencies {
+    shade('uno.unicore:UnicoreConnect-common') { transitive = false }
+    shade('uno.unicore:UnicoreConnect-permissions-luckperms') { transitive = false }
+
+    shade 'org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.9.25'
+    shade 'io.socket:socket.io-client:2.1.1'
+    shade 'com.squareup.okhttp3:okhttp:4.12.0'
+    shade 'com.google.code.gson:gson:2.10.1'
+
+    compileOnly 'net.luckperms:api:5.4'
+}
+
+tasks.named('processResources', ProcessResources).configure {
+    def replacements = [
+        modVersion          : project.version,
+        minecraftVersion    : minecraftVersion,
+        neoforgeVersionRange: neoforgeVersionRange,
+    ]
+
+    inputs.properties replacements
+
+    filesMatching('META-INF/neoforge.mods.toml') {
+        expand replacements
+    }
+}
+
+tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar).configure {
+    configurations = [project.configurations.shade]
+    archiveClassifier.set('')
+
+    relocate 'kotlin', 'ru.unicorecms.unicoreconnect.libs.kotlin'
+    relocate 'org.intellij', 'ru.unicorecms.unicoreconnect.libs.intellij'
+    relocate 'io.socket', 'ru.unicorecms.unicoreconnect.libs.socket'
+    relocate 'com.google.gson', 'ru.unicorecms.unicoreconnect.libs.gson'
+    relocate 'okhttp3', 'ru.unicorecms.unicoreconnect.libs.okhttp3'
+    relocate 'okio', 'ru.unicorecms.unicoreconnect.libs.okio'
+    relocate 'org.json', 'ru.unicorecms.unicoreconnect.libs.json'
+
+    exclude 'META-INF/maven/**'
+    exclude 'META-INF/*.SF'
+    exclude 'META-INF/*.DSA'
+    exclude 'META-INF/*.RSA'
+}
+
+tasks.named('jar').configure {
+    archiveClassifier.set('slim')
+}
+
+tasks.named('assemble').configure {
+    dependsOn tasks.named('shadowJar')
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+}
+
+kotlin {
+    compilerOptions {
+        jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_21
+    }
+}

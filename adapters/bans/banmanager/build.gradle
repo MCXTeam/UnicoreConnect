@@ -1,0 +1,10 @@
+plugins {
+    id 'org.jetbrains.kotlin.jvm' version '1.9.25'
+}
+
+dependencies {
+    api project(':UnicoreConnect-common')
+
+    compileOnly 'org.spigotmc:spigot-api:1.12.2-R0.1-SNAPSHOT'
+    compileOnly 'me.confuser.banmanager:BanManagerCommon:7.7.0-SNAPSHOT'
+}

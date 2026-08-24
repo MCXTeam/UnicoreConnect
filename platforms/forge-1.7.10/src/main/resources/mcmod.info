@@ -1,0 +1,12 @@
+[
+  {
+    "modid": "unicoreconnect",
+    "name": "UnicoreConnect",
+    "description": "Связь игрового сервера с UnicoreCMS",
+    "version": "${modVersion}",
+    "mcversion": "${minecraftVersion}",
+    "url": "https://github.com/MCXTeam/UnicoreConnect",
+    "authorList": ["UnicoreCMS"],
+    "dependencies": []
+  }
+]
