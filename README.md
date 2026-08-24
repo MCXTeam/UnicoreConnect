@@ -29,6 +29,7 @@
 | --- | --- | --- |
 | `luckperms` | Bukkit, Forge с портом LuckPerms | Выдаёт группы и права через API, понимает срок действия |
 | `forgeessentials` | Forge 1.7.10 и 1.12.2 | Выдаёт группы и права через API ForgeEssentials |
+| `luxinfine` | Forge 1.7.10 с LuxinfineHelper | Выдаёт группы и права через провайдер прав LuxinfineHelper, понимает срок действия |
 | `commands` | везде | Выполняет консольные команды из конфигурации |
 
 Адаптер выбирается настройкой `permissions.adapter`: `auto` — взять первый доступный,
@@ -47,9 +48,26 @@ ForgeEssentials не хранит срок действия прав: време
 | --- | --- | --- |
 | `vault` | Bukkit | Отдаёт баланс сайта другим плагинам через Vault |
 | `banmanager` | Bukkit | Двусторонняя синхронизация банов с сайтом |
+| `luxinfine` (экономика) | Forge 1.7.10 с LuxinfineHelper | Регистрирует баланс сайта как интеграцию `unicorecms` |
+| `luxinfine` (баны) | Forge 1.7.10 с LuxinfineHelper | Баны через провайдер наказаний LuxinfineHelper |
 
 На Forge баны идут через ванильный банлист сервера, а экономика работает сама по себе —
 баланс хранится на сайте.
+
+### LuxinfineHelper
+
+[LuxinfineHelper](https://github.com/LuxinfineTeam/PublicLibraries/tree/main/LuxinfineHelper) —
+слой интеграций для 1.7.10: за ним могут стоять LuxinfinePermissions, LuxinfineEconomy, Vault,
+LuckPerms, ванильные баны и другие провайдеры. Мод для 1.7.10 работает с ним напрямую, поэтому
+один адаптер закрывает сразу всё, что настроено в `config/Luxinfine/LFHelperIntegrations.json`.
+
+- **Права** берутся, если провайдер умеет выдавать группы или права. Провайдер `OpBased` умеет
+  только читать, поэтому на нём выдача уходит в адаптер `commands`, а проверки прав команд
+  всё равно идут через LuxinfineHelper.
+- **Баны** идут через провайдер наказаний, если он поддерживает тип `BAN`.
+- **Экономика** регистрируется как интеграция с именем `unicorecms`. Чтобы мод на LuxinfineHelper
+  брал баланс с сайта, выберите её в его настройке провайдера экономики. Проверить список —
+  команда `/integrations`.
 
 ## Установка и настройка
 

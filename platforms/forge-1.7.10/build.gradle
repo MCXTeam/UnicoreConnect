@@ -25,6 +25,28 @@ repositories {
     mavenLocal()
     mavenCentral()
     maven { url = 'https://nexus.gtnewhorizons.com/repository/public/' }
+    ivy {
+        url = 'https://raw.githubusercontent.com/LuxinfineTeam/PublicLibraries/208fcbb52346d00d266a173287e5effb7ce0c476'
+        patternLayout {
+            artifact '[organisation]/[module]-[revision]-[classifier].[ext]'
+        }
+        metadataSources {
+            artifact()
+        }
+        content {
+            includeGroup 'LuxinfineHelper'
+        }
+    }
+}
+
+sourceSets {
+    main {
+        kotlin {
+            srcDir '../../adapters/permissions/luxinfine/src/main/kotlin'
+            srcDir '../../adapters/economy/luxinfine/src/main/kotlin'
+            srcDir '../../adapters/bans/luxinfine/src/main/kotlin'
+        }
+    }
 }
 
 configurations {
@@ -35,6 +57,8 @@ configurations {
 dependencies {
     shade("uno.unicore:UnicoreConnect-common:${modVersion}") { transitive = false }
     shade("uno.unicore:UnicoreConnect-permissions-forgeessentials:${modVersion}") { transitive = false }
+
+    compileOnly 'LuxinfineHelper:LuxinfineHelper:1.7.10-1.9.8:dev'
 
     shade 'org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.2.20'
     shade 'io.socket:socket.io-client:2.1.1'

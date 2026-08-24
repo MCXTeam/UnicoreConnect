@@ -5,17 +5,21 @@ import net.minecraft.entity.player.EntityPlayerMP
 import net.minecraft.server.MinecraftServer
 import net.minecraft.server.management.UserListBansEntry
 import ru.unicorecms.unicoreconnect.adapters.permissions.forgeessentials.ForgeEssentialsAdapter
+import ru.unicorecms.unicoreconnect.adapters.permissions.luxinfine.LuxinfinePermissionsAdapter
 import ru.unicorecms.unicoreconnect.common.platform.BanAdapter
 import java.util.Date
 import java.util.UUID
 
 object ForgePermissions {
+    val luxinfine = LuxinfinePermissionsAdapter()
     val forgeEssentials = ForgeEssentialsAdapter()
 
     fun check(handle: EntityPlayerMP, permission: String): Boolean {
         if (handle.canCommandSenderUseCommand(2, "")) return true
 
-        return forgeEssentials.has(handle.uniqueID, permission) ?: false
+        return luxinfine.has(handle.uniqueID, permission)
+            ?: forgeEssentials.has(handle.uniqueID, permission)
+            ?: false
     }
 }
 

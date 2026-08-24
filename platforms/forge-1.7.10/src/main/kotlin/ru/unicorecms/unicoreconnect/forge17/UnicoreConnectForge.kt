@@ -11,6 +11,8 @@ import cpw.mods.fml.common.gameevent.PlayerEvent
 import cpw.mods.fml.common.gameevent.TickEvent
 import net.minecraft.entity.player.EntityPlayerMP
 import net.minecraft.server.MinecraftServer
+import ru.unicorecms.unicoreconnect.adapters.bans.luxinfine.LuxinfineBanAdapter
+import ru.unicorecms.unicoreconnect.adapters.economy.luxinfine.LuxinfineEconomyBridge
 import ru.unicorecms.unicoreconnect.common.SocketClient
 import ru.unicorecms.unicoreconnect.common.UnicoreCommon
 import ru.unicorecms.unicoreconnect.common.config.JsonConfigLoader
@@ -99,10 +101,11 @@ class UnicoreConnectForge {
 
         permissionAdapter = choosePermissionAdapter()
         logger.info("Система прав: ${permissionAdapter?.id ?: "выключена"}")
+        logger.info("Баны: ${platform.bans?.id ?: "выключены"}")
 
         socketClient = SocketClient(logger).also { it.connect() }
 
-        if (config.modules.money) economyModule = EconomyModule(platform).also { it.register(emptyList()) }
+        if (config.modules.money) economyModule = EconomyModule(platform).also { it.register(listOf(LuxinfineEconomyBridge())) }
         if (config.modules.donate) donateModule = DonateModule(platform).also { it.start() }
         if (config.modules.bans) bansModule = BansModule(platform)
         if (config.modules.playtime) playtimeTracker = PlaytimeTracker(platform).also { it.start() }
@@ -129,11 +132,14 @@ class UnicoreConnectForge {
         if (!UnicoreCommon.config.modules.donate) return null
 
         val requested = UnicoreCommon.config.permissions.adapter
+        val luxinfine = ForgePermissions.luxinfine
         val forgeEssentials = ForgePermissions.forgeEssentials
 
         return when {
+            requested == luxinfine.id -> luxinfine
             requested == forgeEssentials.id -> forgeEssentials
             requested == PermissionsConfig.ADAPTER_COMMANDS -> CommandPermissionAdapter(platform)
+            luxinfine.available() -> luxinfine
             forgeEssentials.available() -> forgeEssentials
             else -> CommandPermissionAdapter(platform)
         }
@@ -156,10 +162,12 @@ class UnicoreConnectForge {
         val platform: ForgePlatformImpl by lazy {
             val logger = ForgeLogger()
 
+            val luxinfineBans = LuxinfineBanAdapter()
+
             ForgePlatformImpl(
                 { server },
                 DelegatingPermissionAdapter { permissionAdapter },
-                VanillaBanAdapter { server },
+                if (luxinfineBans.available()) luxinfineBans else VanillaBanAdapter { server },
                 ForgeItemBridge(logger),
             )
         }
