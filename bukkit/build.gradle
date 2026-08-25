@@ -1,5 +1,10 @@
 plugins {
+    id 'com.gradleup.shadow' version '8.3.5'
     id 'org.jetbrains.kotlin.jvm' version '1.9.25'
+}
+
+base {
+    archivesName = 'UnicoreConnect-bukkit'
 }
 
 dependencies {
@@ -18,4 +23,25 @@ dependencies {
     compileOnly 'me.confuser.banmanager:BanManagerBukkit:7.7.0-SNAPSHOT'
     compileOnly 'net.essentialsx:EssentialsX:2.19.0'
     compileOnly files('libs/CMIAPI8.7.8.2.jar')
+}
+
+tasks.named('jar', Jar).configure {
+    archiveClassifier.set('slim')
+}
+
+shadowJar {
+    archiveClassifier.set('')
+
+    relocate 'io.socket', 'ru.unicorecms.unicoreconnect.libs.socket'
+    relocate 'com.google.gson', 'ru.unicorecms.unicoreconnect.libs.gson'
+    relocate 'okhttp3', 'ru.unicorecms.unicoreconnect.libs.okhttp3'
+    relocate 'okio', 'ru.unicorecms.unicoreconnect.libs.okio'
+    relocate 'co.aikar.commands', 'ru.unicorecms.unicoreconnect.libs.acf'
+    relocate 'co.aikar.locales', 'ru.unicorecms.unicoreconnect.libs.locales'
+    relocate 'me.limito.bukkit.jsonnbt', 'ru.unicorecms.unicoreconnect.libs.jsonnbt'
+    relocate 'me.dpohvar.powernbt', 'ru.unicorecms.unicoreconnect.libs.powernbt'
+}
+
+artifacts {
+    archives shadowJar
 }

@@ -9,7 +9,7 @@
 
 | Файл | Платформа | Версии игры | Java |
 | --- | --- | --- | --- |
-| `UnicoreConnect-universal` | Spigot, Paper и их форки, гибриды (Thermos, Mohist, Magma) | 1.7.10 — 1.18.1 | 8+ |
+| `UnicoreConnect-bukkit` | Spigot, Paper и их форки, гибриды (Thermos, Mohist, Magma) | 1.7.10 — 1.18.1 | 8+ |
 | `UnicoreConnect-forge-1.7.10` | Forge | 1.7.10 | 8 |
 | `UnicoreConnect-forge-1.12.2` | Forge | 1.12.2 | 8 |
 | `UnicoreConnect-forge-1.19.2` | Forge | 1.19.2 | 17 |
@@ -123,6 +123,8 @@ cd UnicoreConnect/
 cd platforms/forge-1.20.1 && ../../gradlew build
 ```
 
+Файл плагина — `bukkit/build/libs/UnicoreConnect-bukkit-<версия>.jar`.
+
 #### Forge 1.7.10 и 1.12.2
 
 Старые версии собираются отдельным Gradle, поэтому ядро сначала кладётся в mavenLocal:
@@ -132,7 +134,7 @@ cd platforms/forge-1.20.1 && ../../gradlew build
 cd platforms/forge-1.12.2 && ./gradlew build
 ```
 
-Собранные файлы лежат в `build/libs`.
+Собранные файлы лежат в `build/libs` своего модуля.
 
 ## Релизы
 

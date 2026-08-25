@@ -28,7 +28,3 @@ project(':adapters:bans:banmanager').name = 'UnicoreConnect-bans-banmanager'
 
 include 'bukkit'
 findProject(':bukkit')?.name = 'UnicoreConnect-bukkit'
-include 'sponge'
-findProject(':sponge')?.name = 'UnicoreConnect-sponge'
-include 'universal'
-findProject(':universal')?.name = 'UnicoreConnect-universal'

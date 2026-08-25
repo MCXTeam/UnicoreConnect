@@ -1,7 +1,0 @@
-  [{
-    "modid": "unicoreconnect",
-    "name": UnicoreConnect",
-    "description": "Plugin for integrating ZirconiaCMS with the Spigot and Sponge server platforms",
-    "mcversion": "1.12.2",
-    "authorList": ["UnicoreProject"],
-  }]
