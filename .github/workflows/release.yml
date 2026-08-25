@@ -2,19 +2,44 @@ name: Release
 
 on:
   push:
-    tags: ['v*']
+    branches: [main]
   workflow_dispatch:
-    inputs:
-      tag:
-        description: Тег релиза, например v1.1.0
-        required: true
 
 permissions:
   contents: write
 
 jobs:
+  version:
+    name: Версия
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.read.outputs.version }}
+      publish: ${{ steps.read.outputs.publish }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Прочитать версию
+        id: read
+        run: |
+          version=$(grep '^version=' gradle.properties | cut -d= -f2)
+          if [ -z "$version" ]; then
+            echo "В gradle.properties нет строки version=" >&2
+            exit 1
+          fi
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          if git rev-parse "refs/tags/v$version" >/dev/null 2>&1; then
+            echo "Версия $version уже выпущена, релиз пропущен"
+            echo "publish=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "Готовим релиз v$version"
+            echo "publish=true" >> "$GITHUB_OUTPUT"
+          fi
+
   bukkit:
     name: Bukkit
+    needs: version
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -26,7 +51,7 @@ jobs:
 
       - uses: gradle/actions/setup-gradle@v4
 
-      - name: Build
+      - name: Сборка
         run: ./gradlew build --no-daemon
 
       - uses: actions/upload-artifact@v4
@@ -37,6 +62,7 @@ jobs:
 
   forge:
     name: ${{ matrix.platform }}
+    needs: version
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -72,6 +98,7 @@ jobs:
 
   legacy:
     name: ${{ matrix.platform }}
+    needs: version
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -107,7 +134,8 @@ jobs:
 
   publish:
     name: Публикация релиза
-    needs: [bukkit, forge, legacy]
+    needs: [version, bukkit, forge, legacy]
+    if: needs.version.outputs.publish == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -127,11 +155,11 @@ jobs:
       - name: Собрать список изменений
         id: changelog
         run: |
-          previous=$(git describe --tags --abbrev=0 "${GITHUB_REF_NAME}^" 2>/dev/null || true)
+          previous=$(git describe --tags --abbrev=0 2>/dev/null || true)
           if [ -n "$previous" ]; then
-            range="$previous..${GITHUB_REF_NAME}"
+            range="$previous..HEAD"
           else
-            range="${GITHUB_REF_NAME}"
+            range="HEAD"
           fi
           {
             echo 'body<<CHANGELOG_EOF'
@@ -141,8 +169,8 @@ jobs:
 
       - uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ github.event.inputs.tag || github.ref_name }}
-          name: UnicoreConnect ${{ github.event.inputs.tag || github.ref_name }}
+          tag_name: v${{ needs.version.outputs.version }}
+          name: UnicoreConnect v${{ needs.version.outputs.version }}
           body: ${{ steps.changelog.outputs.body }}
           files: release/*.jar
           draft: false

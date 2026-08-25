@@ -4,7 +4,6 @@ defaultTasks 'build'
 
 allprojects {
     group 'uno.unicore'
-    version '1.1.0'
 }
 
 subprojects {

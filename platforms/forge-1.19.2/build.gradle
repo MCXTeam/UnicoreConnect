@@ -4,8 +4,12 @@ plugins {
     id 'com.gradleup.shadow' version '8.3.5'
 }
 
+def rootProperties = new Properties()
+
+file('../../gradle.properties').withInputStream { rootProperties.load(it) }
+
 group = 'uno.unicore'
-version = modVersion
+version = rootProperties.getProperty('version')
 
 base {
     archivesName = "UnicoreConnect-forge-${minecraftVersion}"

@@ -4,8 +4,12 @@ plugins {
     id 'com.gradleup.shadow' version '9.6.1'
 }
 
+def rootProperties = new Properties()
+
+file('../../gradle.properties').withInputStream { rootProperties.load(it) }
+
 group = 'uno.unicore'
-version = modVersion
+version = rootProperties.getProperty('version')
 
 base {
     archivesName = "UnicoreConnect-forge-${minecraftVersion}"
@@ -33,8 +37,8 @@ configurations {
 }
 
 dependencies {
-    shade("uno.unicore:UnicoreConnect-common:${modVersion}") { transitive = false }
-    shade("uno.unicore:UnicoreConnect-permissions-forgeessentials:${modVersion}") { transitive = false }
+    shade("uno.unicore:UnicoreConnect-common:${version}") { transitive = false }
+    shade("uno.unicore:UnicoreConnect-permissions-forgeessentials:${version}") { transitive = false }
 
     shade 'org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.2.20'
     shade 'io.socket:socket.io-client:2.1.1'
