@@ -4,6 +4,8 @@ import ru.unicorecms.unicoreconnect.common.UnicoreCommon
 import ru.unicorecms.unicoreconnect.common.types.Money
 import ru.unicorecms.unicoreconnect.common.types.MoneyDepositWithdraw
 import ru.unicorecms.unicoreconnect.common.types.MoneyTransfer
+import ru.unicorecms.unicoreconnect.common.types.RealBalance
+import ru.unicorecms.unicoreconnect.common.types.RealDepositWithdraw
 import java.util.*
 
 class MoneyService {
@@ -37,5 +39,17 @@ class MoneyService {
 
     fun top(): Array<Money> {
         return UnicoreCommon.requester.get("$baseUrl/top/${config.server}").getOrThrow()
+    }
+
+    fun findReal(uuid: UUID): RealBalance {
+        return UnicoreCommon.requester.get("$baseUrl/user/$uuid/real").getOrThrow()
+    }
+
+    fun depositReal(uuid: UUID, amount: Double): RealBalance {
+        return UnicoreCommon.requester.post("$baseUrl/user/deposit/real", RealDepositWithdraw(uuid.toString(), amount)).getOrThrow()
+    }
+
+    fun withdrawReal(uuid: UUID, amount: Double): RealBalance {
+        return UnicoreCommon.requester.post("$baseUrl/user/withdraw/real", RealDepositWithdraw(uuid.toString(), amount)).getOrThrow()
     }
 }
