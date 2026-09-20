@@ -152,6 +152,14 @@ cd platforms/forge-1.12.2 && ./gradlew build
 | /money pay \[player\] \[amount\] | unicoreconnect.command.money.pay | Перевести монеты игроку |
 **Алиасы:** /bal, /balance
 
+| Команды | Пермишен | Описание |
+| --- |  --- |  --- |
+| /real | unicoreconnect.command.real | Баланс на сайте: реальная валюта и бонусы |
+**Алиасы:** /rbal
+
+`/money` показывает внутриигровой баланс этого сервера, `/real` — баланс на сайте, общий для всех
+серверов: реальную валюту и бонусы. Обе команды включаются модулем `money`.
+
 ### PlayTime
 Команды | Пермишен | Описание |
 | --- |  --- |  --- |
@@ -200,6 +208,9 @@ unicoreconnect.command_money_pay=Перевод игроку <c2>{target}</c2> �
 unicoreconnect.command_money_pay_target=Вам поступил перевод <c2>{amount}</c2> от <c2>{player}</c2>
 unicoreconnect.command_money_pay_fail=При переводе произошла ошибка, возможно на балансе недостаточно денег!
 unicoreconnect.command_money_top=<c2>Топ-богачей {server}:</c2>\n{rows}
+
+unicoreconnect.command_real=Баланс на сайте: <c2>{real}</c2>, бонусы: <c2>{virtual}</c2>
+unicoreconnect.command_real_fail=Баланс на сайте получить не удалось
 
 unicoreconnect.command_playtime=Время проведённое на сервере {server}: <c2>{time}</c2>
 unicoreconnect.command_playtime_top=<c2>Топ-онлайн {server}:</c2>\n{rows}

@@ -19,6 +19,7 @@ object UnicoreCommands {
         val config = UnicoreCommon.config
 
         if (config.modules.money) registerMoney(dispatcher, platform)
+        if (config.modules.money) registerReal(dispatcher, platform)
         if (config.modules.playtime) registerPlaytime(dispatcher, platform)
         if (config.modules.showcase) registerShowcase(dispatcher, platform)
 
@@ -99,6 +100,28 @@ object UnicoreCommands {
                                 )
                         )
                 )
+        )
+    }
+
+    private fun registerReal(dispatcher: CommandDispatcher<CommandSourceStack>, platform: ForgePlatformImpl) {
+        dispatcher.register(
+            Commands.literal("real")
+                .requires { permitted(it, platform, Permissions.REAL) }
+                .executes { context ->
+                    val player = playerOf(context.source, platform) ?: return@executes 0
+
+                    platform.scheduler.async {
+                        runCatching { UnicoreCommon.moneyService.findReal(player.uuid) }
+                            .onSuccess {
+                                player.sendMessage(
+                                    "Баланс на сайте: ${Formats.real(it.real)}, бонусы: ${Formats.money(it.virtual)}"
+                                )
+                            }
+                            .onFailure { player.sendMessage("Баланс на сайте получить не удалось") }
+                    }
+
+                    1
+                }
         )
     }
 

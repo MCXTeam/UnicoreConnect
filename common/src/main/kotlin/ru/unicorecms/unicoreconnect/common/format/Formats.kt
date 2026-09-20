@@ -10,6 +10,8 @@ object Formats {
 
     fun money(amount: Double): String = money.format(amount)
 
+    fun real(amount: Double): String = "${money.format(amount)} руб."
+
     fun duration(minutes: Long): String {
         val totalMinutes = if (minutes < 0) 0 else minutes
         val days = TimeUnit.MINUTES.toDays(totalMinutes)

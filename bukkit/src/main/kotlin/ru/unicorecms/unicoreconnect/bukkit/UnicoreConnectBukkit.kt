@@ -4,6 +4,7 @@ import org.bukkit.Bukkit
 import org.bukkit.plugin.java.JavaPlugin
 import ru.unicorecms.unicoreconnect.bukkit.commands.MoneyCommand
 import ru.unicorecms.unicoreconnect.bukkit.commands.PlaytimeCommand
+import ru.unicorecms.unicoreconnect.bukkit.commands.RealCommand
 import ru.unicorecms.unicoreconnect.bukkit.commands.ShowcaseCommand
 import ru.unicorecms.unicoreconnect.bukkit.commands.UnicoreConnectCommand
 import ru.unicorecms.unicoreconnect.bukkit.config.UnicorePluginConfig
@@ -91,6 +92,7 @@ class UnicoreConnectBukkit : JavaPlugin() {
 
         CommandManager.manager.registerCommand(UnicoreConnectCommand())
         if (unicoreConfig.modules.money) CommandManager.manager.registerCommand(MoneyCommand())
+        if (unicoreConfig.modules.money) CommandManager.manager.registerCommand(RealCommand())
         if (unicoreConfig.modules.playtime) CommandManager.manager.registerCommand(PlaytimeCommand())
         if (unicoreConfig.modules.showcase) CommandManager.manager.registerCommand(ShowcaseCommand())
 

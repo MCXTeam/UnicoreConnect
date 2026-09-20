@@ -140,6 +140,21 @@ class MoneyCommand(platform: ForgePlatformImpl) :
     }
 }
 
+class RealCommand(platform: ForgePlatformImpl) :
+    UnicoreCommand(platform, "real", "/real", Permissions.REAL) {
+    override fun processCommand(sender: ICommandSender, args: Array<String>) {
+        val player = playerOf(sender) ?: return
+
+        platform.scheduler.async {
+            runCatching { UnicoreCommon.moneyService.findReal(player.uuid) }
+                .onSuccess {
+                    player.sendMessage("Баланс на сайте: ${Formats.real(it.real)}, бонусы: ${Formats.money(it.virtual)}")
+                }
+                .onFailure { player.sendMessage("Баланс на сайте получить не удалось") }
+        }
+    }
+}
+
 class PlaytimeCommand(platform: ForgePlatformImpl) :
     UnicoreCommand(platform, "playtime", "/playtime [top]", Permissions.PLAYTIME) {
     override fun processCommand(sender: ICommandSender, args: Array<String>) {
@@ -301,6 +316,7 @@ object UnicoreCommands {
         val commands = arrayListOf<UnicoreCommand>()
 
         if (config.modules.money) commands.add(MoneyCommand(platform))
+        if (config.modules.money) commands.add(RealCommand(platform))
         if (config.modules.playtime) commands.add(PlaytimeCommand(platform))
         if (config.modules.showcase) commands.add(CartCommand(platform))
 
