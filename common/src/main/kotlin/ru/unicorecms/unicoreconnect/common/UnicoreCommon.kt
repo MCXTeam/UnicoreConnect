@@ -32,6 +32,7 @@ class UnicoreCommon(pluginConfig: UnicoreConfig) {
         lateinit var donateGroupService: DonateGroupService
         lateinit var donatePermissionService: DonatePermissionService
         lateinit var showcaseService: ShowcaseService
+        lateinit var commandsService: CommandsService
     }
 
     init {
@@ -46,5 +47,6 @@ class UnicoreCommon(pluginConfig: UnicoreConfig) {
         donateGroupService = DonateGroupService()
         donatePermissionService = DonatePermissionService()
         showcaseService = ShowcaseService()
+        commandsService = CommandsService()
     }
 }

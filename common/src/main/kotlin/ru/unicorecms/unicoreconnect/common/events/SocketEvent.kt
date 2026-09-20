@@ -8,4 +8,5 @@ class SocketEvent {
     class TAKE_GROUP(val payload: UserDonate)
     class GIVE_PERMISSION(val payload: UserPermission)
     class TAKE_PERMISSION(val payload: UserPermission)
+    class RUN_COMMANDS
 }

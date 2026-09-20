@@ -16,6 +16,7 @@ import ru.unicorecms.unicoreconnect.common.config.JsonConfigLoader
 import ru.unicorecms.unicoreconnect.common.config.PermissionsConfig
 import ru.unicorecms.unicoreconnect.common.events.EventDispatcher
 import ru.unicorecms.unicoreconnect.common.modules.BansModule
+import ru.unicorecms.unicoreconnect.common.modules.CommandsModule
 import ru.unicorecms.unicoreconnect.common.modules.DonateModule
 import ru.unicorecms.unicoreconnect.common.modules.EconomyModule
 import ru.unicorecms.unicoreconnect.common.platform.Cancellable
@@ -97,6 +98,7 @@ class UnicoreConnectForge {
 
         if (config.modules.money) economyModule = EconomyModule(platform).also { it.register(emptyList()) }
         if (config.modules.donate) donateModule = DonateModule(platform).also { it.start() }
+        commandsModule = CommandsModule(platform).also { it.start() }
         if (config.modules.bans) bansModule = BansModule(platform)
         if (config.modules.playtime) playtimeTracker = PlaytimeTracker(platform).also { it.start() }
 
@@ -108,6 +110,7 @@ class UnicoreConnectForge {
         reconnectTask?.cancel()
         playtimeTracker?.stop()
         socketClient?.close()
+        commandsModule?.stop()
         EventDispatcher.clear()
         platform.forgeScheduler.shutdown()
 
@@ -115,6 +118,7 @@ class UnicoreConnectForge {
         donateModule = null
         economyModule = null
         bansModule = null
+        commandsModule = null
         playtimeTracker = null
     }
 
@@ -142,6 +146,7 @@ class UnicoreConnectForge {
         private var donateModule: DonateModule? = null
         private var economyModule: EconomyModule? = null
         private var bansModule: BansModule? = null
+        private var commandsModule: CommandsModule? = null
         private var playtimeTracker: PlaytimeTracker? = null
         private var permissionAdapter: PermissionAdapter? = null
         private var reconnectTask: Cancellable? = null

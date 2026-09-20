@@ -5,6 +5,7 @@ import io.socket.client.Socket
 import ru.unicorecms.unicoreconnect.common.events.EventDispatcher
 import ru.unicorecms.unicoreconnect.common.events.SocketEvent
 import ru.unicorecms.unicoreconnect.common.platform.UnicoreLogger
+import ru.unicorecms.unicoreconnect.common.types.RunCommands
 import ru.unicorecms.unicoreconnect.common.types.User
 import ru.unicorecms.unicoreconnect.common.types.UserDonate
 import ru.unicorecms.unicoreconnect.common.types.UserPermission
@@ -47,6 +48,7 @@ class SocketClient(private val logger: UnicoreLogger) {
         socket?.on("take_group") { args -> handle("take_group") { onTakeGroup(args) } }
         socket?.on("give_permission") { args -> handle("give_permission") { onGivePermission(args) } }
         socket?.on("take_permission") { args -> handle("take_permission") { onTakePermission(args) } }
+        socket?.on("run_commands") { args -> handle("run_commands") { onRunCommands(args) } }
 
         socket?.on(Socket.EVENT_CONNECT_ERROR) { args ->
             logger.warn("UnicoreCMS недоступен: ${args.firstOrNull()}")
@@ -128,6 +130,14 @@ class SocketClient(private val logger: UnicoreLogger) {
         EventDispatcher.post(SocketEvent.TAKE_PERMISSION(payload)) { logger.error("Ошибка обработчика take_permission", it) }
     }
 
+    private fun onRunCommands(args: Array<out Any>) {
+        val payload = parse<RunCommands>(args) ?: return
+
+        if (payload.serverId != config.server) return
+
+        EventDispatcher.post(SocketEvent.RUN_COMMANDS()) { logger.error("Ошибка обработчика run_commands", it) }
+    }
+
     private inline fun <reified T> parse(args: Array<out Any>): T? {
         val payload = args.firstOrNull() ?: return null
 
@@ -135,6 +145,6 @@ class SocketClient(private val logger: UnicoreLogger) {
     }
 
     companion object {
-        const val CONNECT_PERMISSION = "kernel.unicore.connect"
+        const val CONNECT_PERMISSION = "kernel.connect"
     }
 }

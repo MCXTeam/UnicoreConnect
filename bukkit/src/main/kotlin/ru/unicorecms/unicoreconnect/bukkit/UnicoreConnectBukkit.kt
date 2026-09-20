@@ -21,6 +21,7 @@ import ru.unicorecms.unicoreconnect.common.UnicoreCommon
 import ru.unicorecms.unicoreconnect.common.config.PermissionsConfig
 import ru.unicorecms.unicoreconnect.common.events.EventDispatcher
 import ru.unicorecms.unicoreconnect.common.modules.BansModule
+import ru.unicorecms.unicoreconnect.common.modules.CommandsModule
 import ru.unicorecms.unicoreconnect.common.modules.DonateModule
 import ru.unicorecms.unicoreconnect.common.modules.EconomyModule
 import ru.unicorecms.unicoreconnect.common.platform.CommandPermissionAdapter
@@ -42,6 +43,7 @@ class UnicoreConnectBukkit : JavaPlugin() {
     private var donateModule: DonateModule? = null
     private var bansModule: BansModule? = null
     private var economyModule: EconomyModule? = null
+    private var commandsModule: CommandsModule? = null
 
     override fun onEnable() {
         platform = BukkitPlatform(this, choosePermissionAdapter(), chooseBanAdapter(), null)
@@ -96,11 +98,14 @@ class UnicoreConnectBukkit : JavaPlugin() {
         if (unicoreConfig.modules.playtime) CommandManager.manager.registerCommand(PlaytimeCommand())
         if (unicoreConfig.modules.showcase) CommandManager.manager.registerCommand(ShowcaseCommand())
 
+        commandsModule = CommandsModule(platform).also { it.start() }
+
         Bukkit.getScheduler().scheduleSyncRepeatingTask(this, { socketClient.reconnectHandler() }, 20 * 10, 20 * 3)
     }
 
     override fun onDisable() {
         economyModule?.unregister()
+        commandsModule?.stop()
         EventDispatcher.clear()
 
         if (this::socketClient.isInitialized) socketClient.close()
